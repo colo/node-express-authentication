@@ -1,0 +1,29 @@
+{
+  "name": "authentication",
+  "version": "0.0.1",
+  "description": "Authentication module",
+  "author": {
+    "name": "Luciano Bueno",
+    "email": "glamero@gmail.com"
+  },
+  "engines": {
+    "node": ">= 0.4.8"
+  },
+  "dependencies": {
+    "passport": "~0.2.1",
+    "passport-local": "~1.0.0",
+    "passport-http": "~0.2.2"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://www.opensource.org/licenses/MIT"
+    }
+  ],
+  "keywords": [
+    "login",
+    "authentication"
+  ]
+}
