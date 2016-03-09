@@ -22,19 +22,19 @@ module.exports = new Class({
   
   ON_AUTH: 'onAuth',
   
-  server: null,
+  app: null,
   passport: null,
   store: null,
   auth: null,
   
-  initialize: function(server, store, auth){
-	this.server = server;
+  initialize: function(app, store, auth){
+	this.app = app;
 	
 	this.addEvent(this.ON_AUTH, function(obj){
 	  if(obj.error)
-		server.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
+		app.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
 	  else
-		server.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
+		app.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
 	}.bind(this));
 	
 	this.store = store;
@@ -60,34 +60,34 @@ module.exports = new Class({
 	  // asynchronous verification, for effect...
 	  process.nextTick(function () {
 		
-		// Find the user by username.  If there is no user with the given
-		// username, or the password is not correct, set the user to `false` to
-		// indicate failure and set a flash message.  Otherwise, return the
-		// authenticated `user`.
-		this.auth.authenticate(username, password, function(err, user) {
-		  
-		  user = this.store.findByUserName(user);
-		  
-		  this.fireEvent(this.ON_AUTH, {error: err, username: username});
-// 			console.log('err ' +err);
-// 			console.log('auth');
-// 			if (err) { 
-// 			  return done(err);
-// 			}
-		  if (!user) {
-// 			  console.log('no user ' +username);
-			return done(null, false, { message: err.message });
-		  }
-// 			if (user.password != password) { 
-// 			  console.log(user);
-// 			  return done(null, false, { message: 'Invalid password' }); 
-// 			}
-		  
-// 			console.log('user');
-// 			console.log(user);
-		  return done(null, user);
-		  
-		}.bind(this))
+			// Find the user by username.  If there is no user with the given
+			// username, or the password is not correct, set the user to `false` to
+			// indicate failure and set a flash message.  Otherwise, return the
+			// authenticated `user`.
+			this.auth.authenticate(username, password, function(err, user) {
+				
+				user = this.store.findByUserName(user);
+				
+				this.fireEvent(this.ON_AUTH, {error: err, username: username});
+	// 			console.log('err ' +err);
+	// 			console.log('auth');
+	// 			if (err) { 
+	// 			  return done(err);
+	// 			}
+				if (!user) {
+	// 			  console.log('no user ' +username);
+				return done(null, false, { message: err.message });
+				}
+	// 			if (user.password != password) { 
+	// 			  console.log(user);
+	// 			  return done(null, false, { message: 'Invalid password' }); 
+	// 			}
+				
+	// 			console.log('user');
+	// 			console.log(user);
+				return done(null, user);
+				
+			}.bind(this))
 		
 	  }.bind(this));
 	};
@@ -95,8 +95,11 @@ module.exports = new Class({
 	var LocalStrategy = require('passport-local').Strategy;
 	var BasicStrategy = require('passport-http').BasicStrategy;
 	
-	this.server['authenticate'] = function(req, res, next, func){
-// 	  console.log(req);
+	
+	this.app['authenticate'] = function(req, res, next, func){
+ 	//console.log('req.headers');
+	//console.log(req.headers);
+	  
 	  if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
 		console.log('nod-express-auth: setting BasicStrategy');
 		// Use the LocalStrategy within Passport.
