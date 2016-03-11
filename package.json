@@ -10,6 +10,7 @@
     "node": ">= 0.4.8"
   },
   "dependencies": {
+    "connect-flash": "^0.1.1",
     "mootools": "^1.5.2",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
