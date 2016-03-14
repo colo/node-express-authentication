@@ -80,7 +80,11 @@ module.exports = new Class({
 				// indicate failure and set a flash message.  Otherwise, return the
 				// authenticated `user`.
 				this.options.auth.authenticate(username, password, function(err, user) {
-					
+					//console.log('auth.authenticate err: ');
+					//console.log(err);
+					//console.log('auth.authenticate user: ');
+					//console.log(user);
+						
 					user = this.options.store.findByUserName(user);
 					
 					this.fireEvent(this.ON_AUTH, {error: err, username: username});
@@ -90,8 +94,10 @@ module.exports = new Class({
 		// 			  return done(err);
 		// 			}
 					if (!user) {
-		// 			  console.log('no user ' +username);
-					return done(null, false, { message: err.message });
+			// 			  console.log('no user ' +username);
+						//err.message = 'Wrong credentials';
+						//return done(null, false, { error: err });
+						return done(null, false, { error: err });
 					}
 		// 			if (user.password != password) { 
 		// 			  console.log(user);
@@ -148,12 +154,92 @@ module.exports = new Class({
 			}
 		}.bind(this);
 		
+		//implements a check_authentication function on the App, only if the App doens't implement one
+		if(!this.app.check_authentication){
+			console.log('no authentication method');
+
+			this.app['check_authentication'] = function(req, res, next){
+				  if (!req.isAuthenticated()) {
+					
+					//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+					  
+					  this.app.authenticate(req, res, next,  function(err, user, info) {
+						
+						//console.log('authenticate err: ');
+						//console.log(err);
+						//console.log('authenticate user: ');
+						//console.log(user);
+						//console.log('authenticate info: ');
+						//console.log(info);
+						
+						this.app.profile('login_authenticate');
+						
+						if (err) {
+						  this.app.log('login', 'error', err);
+						  req.flash('error', err);
+						  //res.send(info);
+							//return next(err)
+							//res.status(500).send(err);
+							res.status(500);
+							return next();
+						}
+						if (!user) {
+						  this.app.log('login', 'warn', 'login authenticate ' + info);
+						  req.flash('error', info);
+						  //res.send(info);
+							//res.status(403).send(info);
+							//return next(info.message)
+							res.status(403);
+							return next();
+						}
+						else{
+						  req.logIn(user, function(err) {
+							if (err) {
+							  this.app.log('login', 'error', err);
+							  req.flash('error', err);
+							  //res.status(500).send(err);
+							  res.status(500);
+							  return next();
+							  //res.send(info.message);
+							}
+							
+							console.log('error');
+							console.log(err);
+							
+	  // 					  server.log('login', 'info', 'login authenticate ' + util.inspect(user));
+							
+							return next();
+							
+						  }.bind(this));
+						}
+					  }.bind(this));
+					
+					//}
+					//else{
+					  //if(req.is('application/json') || req.path.indexOf('/api') == 0){
+						//server.redirect('app:api/login', req, res, next);
+					  //}
+					  //else{
+						//server.redirect('app:login', req, res, next);
+					  //}
+					//}
+				  }
+				  else{
+					console.log('authenticated');
+					next();
+				  }
+			}.bind(this);
+
+		  
+		}
 		
 		app.express().use(flash());//for passport 
 		
 		app.express().use(this.passport.initialize());
 		if(this.options.passport.session === true)
 			app.express().use(this.passport.session());
+			
+		
 			
   },
 
