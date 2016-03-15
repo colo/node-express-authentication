@@ -165,53 +165,58 @@ module.exports = new Class({
 					  
 					  this.app.authenticate(req, res, next,  function(err, user, info) {
 						
-						//console.log('authenticate err: ');
-						//console.log(err);
-						//console.log('authenticate user: ');
-						//console.log(user);
-						//console.log('authenticate info: ');
-						//console.log(info);
-						
-						this.app.profile('login_authenticate');
-						
-						if (err) {
-						  this.app.log('login', 'error', err);
-						  req.flash('error', err);
-						  //res.send(info);
-							//return next(err)
-							//res.status(500).send(err);
-							res.status(500);
-							return next();
-						}
-						if (!user) {
-						  this.app.log('login', 'warn', 'login authenticate ' + info);
-						  req.flash('error', info);
-						  //res.send(info);
-							//res.status(403).send(info);
-							//return next(info.message)
-							res.status(403);
-							return next();
-						}
-						else{
-						  req.logIn(user, function(err) {
+							//console.log('authenticate err: ');
+							//console.log(err);
+							//console.log('authenticate user: ');
+							//console.log(user);
+							//console.log('authenticate info: ');
+							//console.log(info);
+							
+							//this.app.profile('login_authenticate');
+							
 							if (err) {
-							  this.app.log('login', 'error', err);
-							  req.flash('error', err);
-							  //res.status(500).send(err);
-							  res.status(500);
-							  return next();
-							  //res.send(info.message);
+								this.app.log('login', 'error', err);
+								req.flash('error', err);
+								//res.send(info);
+								//return next(err)
+								//res.status(500).send(err);
+								////res.status(500);
+								////return next();
+								this.app['500'](req, res, next, err);
 							}
-							
-							console.log('error');
-							console.log(err);
-							
-	  // 					  server.log('login', 'info', 'login authenticate ' + util.inspect(user));
-							
-							return next();
-							
-						  }.bind(this));
-						}
+							if (!user) {
+								this.app.log('login', 'warn', 'login authenticate ' + info);
+								req.flash('error', info);
+								//res.send(info);
+								//res.status(403).send(info);
+								//return next(info.message)
+								////res.status(403);
+								////return next();
+								
+								this.app['403'](req, res, next, info);
+							}
+							else{
+								req.logIn(user, function(err) {
+									if (err) {
+										this.app.log('login', 'error', err);
+										req.flash('error', err);
+										////res.status(500).send(err);
+										//res.status(500);
+										//return next();
+										////res.send(info.message);
+										this.app['500'](req, res, next, err);
+									}
+									
+									console.log('error');
+									console.log(err);
+									
+				// 					  server.log('login', 'info', 'login authenticate ' + util.inspect(user));
+									
+									return next();
+								
+								}.bind(this));
+							}
+						
 					  }.bind(this));
 					
 					//}
@@ -225,9 +230,10 @@ module.exports = new Class({
 					//}
 				  }
 				  else{
-					console.log('authenticated');
-					next();
+						console.log('authenticated');
+						next();
 				  }
+				  
 			}.bind(this);
 
 		  
