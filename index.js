@@ -155,18 +155,18 @@ module.exports = new Class({
 	}.bind(this);
 	
 	
-	//if(typeof(app) == 'function'){
-		//app.implement({
-			//authenticate: authenticate
-		//});
-	//}
-	//else{
+	if(typeof(app) == 'function'){
+		app.implement({
+			authenticate: authenticate
+		});
+	}
+	else{
 	app['authenticate'] = authenticate;
 		
-	//}
+	}
 	
-	console.log("app['authenticate']");
-	console.log(app.authenticate);
+	//console.log("app['authenticate']");
+	//console.log(app.authenticate);
 	
 	
 	var check_authentication = function(req, res, next){
@@ -174,10 +174,15 @@ module.exports = new Class({
 	  if (!req.isAuthenticated()) {
 
 		console.log('check_authentication');
-		console.log(app);		
+		//console.log(app);		
 		//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
 		  
-		  app.authenticate(req, res, next,  function(err, user, info) {
+		  //console.log(this);
+		  
+		  /**
+		   * this refers to the express app instance, NOT this instance
+		   * */
+		  this['authenticate'](req, res, next,  function(err, user, info) {
 			
 			if (err) {
 				this.log('login', 'error', err);
@@ -202,10 +207,10 @@ module.exports = new Class({
 					
 					return next();
 				
-				}.bind(this));
+				});
 			}
 			
-		  }.bind(app));
+		  }.bind(this));//bound to the express app instance
 
 	  }
 	  else{
@@ -213,7 +218,7 @@ module.exports = new Class({
 		next();
 	  }
 		  
-	}.bind(app);
+	};
 	
 	
 	
