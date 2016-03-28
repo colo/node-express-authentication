@@ -161,8 +161,7 @@ module.exports = new Class({
 		});
 	}
 	else{
-	app['authenticate'] = authenticate;
-		
+		app['authenticate'] = authenticate;
 	}
 	
 	//console.log("app['authenticate']");
