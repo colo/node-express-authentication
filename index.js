@@ -66,7 +66,7 @@ module.exports = new Class({
 		this.passport.deserializeUser(this.options.store.deserialize.bind(this.options.store));
 		
 		/**var authenticate = function(username, password, done) {
-			console.log('node-express-auth: '+ username + ' ' +password);
+			//console.log('node-express-auth: '+ username + ' ' +password);
 
 			// asynchronous verification, for effect...
 			process.nextTick(function () {
@@ -105,8 +105,8 @@ module.exports = new Class({
 			
   },
   extend_app: function(app){
-	console.log('extend app');
-	console.log(typeof(app));
+	//console.log('extend app');
+	//console.log(typeof(app));
 	
 	this.addEvent(this.ON_AUTH, function(obj){
 		if(app.log){
@@ -124,7 +124,7 @@ module.exports = new Class({
 		 * */
 		
 		if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
-			console.log('nod-express-auth: setting BasicStrategy');
+			//console.log('nod-express-auth: setting BasicStrategy');
 			// Use the LocalStrategy within Passport.
 			//   Strategies in passport require a `verify` function, which accept
 			//   credentials (in this case, a username and password), and invoke a callback
@@ -141,7 +141,7 @@ module.exports = new Class({
 			 * 
 			 * {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
 			 * */
-			console.log('nod-express-auth: setting LocalStrategy');
+			//console.log('nod-express-auth: setting LocalStrategy');
 			// Use the LocalStrategy within Passport.
 			//   Strategies in passport require a `verify` function, which accept
 			//   credentials (in this case, a username and password), and invoke a callback
@@ -164,19 +164,19 @@ module.exports = new Class({
 		app['authenticate'] = authenticate;
 	}
 	
-	//console.log("app['authenticate']");
-	//console.log(app.authenticate);
+	////console.log("app['authenticate']");
+	////console.log(app.authenticate);
 	
 	
 	var check_authentication = function(req, res, next){
 		
 	  if (!req.isAuthenticated()) {
 
-		console.log('check_authentication');
-		//console.log(app);		
+		//console.log('check_authentication');
+		////console.log(app);		
 		//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
 		  
-		  //console.log(this);
+		  ////console.log(this);
 		  
 		  /**
 		   * this refers to the express app instance, NOT this instance
@@ -201,8 +201,8 @@ module.exports = new Class({
 						this['500'](req, res, next, err);
 					}
 					
-					console.log('error');
-					console.log(err);
+					//console.log('error');
+					//console.log(err);
 					
 					return next();
 				
@@ -213,7 +213,7 @@ module.exports = new Class({
 
 	  }
 	  else{
-		console.log('authenticated');
+		//console.log('authenticated');
 		next();
 	  }
 		  
@@ -238,7 +238,7 @@ module.exports = new Class({
 	
   },
   authenticate: function(username, password, done) {
-	console.log('node-express-auth-authenticate: '+ username + ' ' +password);
+	//console.log('node-express-auth-authenticate: '+ username + ' ' +password);
 
 	// asynchronous verification, for effect...
 	process.nextTick(function () {
