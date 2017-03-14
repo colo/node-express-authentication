@@ -105,163 +105,163 @@ module.exports = new Class({
 			
   },
   extend_app: function(app){
-	//console.log('extend app');
-	//console.log(typeof(app));
-	
-	this.addEvent(this.ON_AUTH, function(obj){
-		if(app.log){
-			if(obj.error)
-				app.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
-			else
-				app.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
-		}
-	}.bind(this));
-	
-	var authenticate = function(req, res, next, func){
-		/**
-		 * Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
-		 * 
-		 * */
+		//console.log('extend app');
+		//console.log(typeof(app));
 		
-		if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
-			//console.log('nod-express-auth: setting BasicStrategy');
-			// Use the LocalStrategy within Passport.
-			//   Strategies in passport require a `verify` function, which accept
-			//   credentials (in this case, a username and password), and invoke a callback
-			//   with a user object.  In the real world, this would query a database;
-			//   however, in this example we are using a baked-in set of users.
-			this.passport.use(new BasicStrategy(this.authenticate.bind(this)));
-		
-		
-			this.passport.authenticate('basic', {session: this.options.passport.session}, func)(req, res, next);
-		}
-		else{
-			/**
-			 * Content-Type: application/json
-			 * 
-			 * {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
-			 * */
-			//console.log('nod-express-auth: setting LocalStrategy');
-			// Use the LocalStrategy within Passport.
-			//   Strategies in passport require a `verify` function, which accept
-			//   credentials (in this case, a username and password), and invoke a callback
-			//   with a user object.  In the real world, this would query a database;
-			//   however, in this example we are using a baked-in set of users.
-			this.passport.use(new LocalStrategy(this.authenticate.bind(this)));
-		
-			this.passport.authenticate('local', {session: this.options.passport.session}, func)(req, res, next);
-
-		}
-	}.bind(this);
-	
-	
-	if(typeof(app) == 'function'){
-		app.implement({
-			authenticate: authenticate
-		});
-	}
-	else{
-		app['authenticate'] = authenticate;
-	}
-	
-	////console.log("app['authenticate']");
-	////console.log(app.authenticate);
-	
-	
-	var check_authentication = function(req, res, next){
-		
-	  if (!req.isAuthenticated()) {
-
-		//console.log('check_authentication');
-		////console.log(app);		
-		//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
-		  
-		  ////console.log(this);
-		  
-		  /**
-		   * this refers to the express app instance, NOT this instance
-		   * */
-		  this['authenticate'](req, res, next,  function(err, user, info) {
-			
-			if (err) {
-				this.log('login', 'error', err);
-				req.flash('error', err);
-				this['500'](req, res, next, err);
+		this.addEvent(this.ON_AUTH, function(obj){
+			if(app.log){
+				if(obj.error)
+					app.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
+				else
+					app.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
 			}
-			if (!user) {
-				this.log('login', 'warn', 'login authenticate ' + info);
-				req.flash('error', info);
-				this['403'](req, res, next, info);
+		}.bind(this));
+		
+		var authenticate = function(req, res, next, func){
+			/**
+			 * Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
+			 * 
+			 * */
+			
+			if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+				//console.log('nod-express-auth: setting BasicStrategy');
+				// Use the LocalStrategy within Passport.
+				//   Strategies in passport require a `verify` function, which accept
+				//   credentials (in this case, a username and password), and invoke a callback
+				//   with a user object.  In the real world, this would query a database;
+				//   however, in this example we are using a baked-in set of users.
+				this.passport.use(new BasicStrategy(this.authenticate.bind(this)));
+			
+			
+				this.passport.authenticate('basic', {session: this.options.passport.session}, func)(req, res, next);
 			}
 			else{
-				req.logIn(user, function(err) {
-					if (err) {
-						this.log('login', 'error', err);
-						req.flash('error', err);
-						this['500'](req, res, next, err);
-					}
-					
-					//console.log('error');
-					//console.log(err);
-					
-					return next();
-				
-				});
-			}
+				/**
+				 * Content-Type: application/json
+				 * 
+				 * {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
+				 * */
+				//console.log('nod-express-auth: setting LocalStrategy');
+				// Use the LocalStrategy within Passport.
+				//   Strategies in passport require a `verify` function, which accept
+				//   credentials (in this case, a username and password), and invoke a callback
+				//   with a user object.  In the real world, this would query a database;
+				//   however, in this example we are using a baked-in set of users.
+				this.passport.use(new LocalStrategy(this.authenticate.bind(this)));
 			
-		  }.bind(this));//bound to the express app instance
+				this.passport.authenticate('local', {session: this.options.passport.session}, func)(req, res, next);
 
-	  }
-	  else{
-		//console.log('authenticated');
-		next();
-	  }
-		  
-	};
-	
-	
-	
-	//implements a check_authentication function on the App, only if the App doens't implement one
-	if(!app.check_authentication){
+			}
+		}.bind(this);
+		
+		
 		if(typeof(app) == 'function'){
 			app.implement({
-				check_authentication: check_authentication
+				authenticate: authenticate
 			});
 		}
 		else{
-			app['check_authentication'] = check_authentication;
+			app['authenticate'] = authenticate;
 		}
-	}
-	
-	
-	
+		
+		////console.log("app['authenticate']");
+		////console.log(app.authenticate);
+		
+		
+		var check_authentication = function(req, res, next){
+			
+			if (!req.isAuthenticated()) {
+
+			//console.log('check_authentication');
+			////console.log(app);		
+			//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+				
+				////console.log(this);
+				
+				/**
+				 * this refers to the express app instance, NOT this instance
+				 * */
+				this['authenticate'](req, res, next,  function(err, user, info) {
+				
+				if (err) {
+					this.log('login', 'error', err);
+					req.flash('error', err);
+					this['500'](req, res, next, err);
+				}
+				if (!user) {
+					this.log('login', 'warn', 'login authenticate ' + info);
+					req.flash('error', info);
+					this['403'](req, res, next, info);
+				}
+				else{
+					req.logIn(user, function(err) {
+						if (err) {
+							this.log('login', 'error', err);
+							req.flash('error', err);
+							this['500'](req, res, next, err);
+						}
+						
+						//console.log('error');
+						//console.log(err);
+						
+						return next();
+					
+					});
+				}
+				
+				}.bind(this));//bound to the express app instance
+
+			}
+			else{
+				//console.log('authenticated');
+				next();
+			}
+				
+		};
+		
+		
+		
+		//implements a check_authentication function on the App, only if the App doens't implement one
+		if(!app.check_authentication){
+			if(typeof(app) == 'function'){
+				app.implement({
+					check_authentication: check_authentication
+				});
+			}
+			else{
+				app['check_authentication'] = check_authentication;
+			}
+		}
+		
+		
+		
 	
   },
   authenticate: function(username, password, done) {
-	//console.log('node-express-auth-authenticate: '+ username + ' ' +password);
+		//console.log('node-express-auth-authenticate: '+ username + ' ' +password);
 
-	// asynchronous verification, for effect...
-	process.nextTick(function () {
-	
-		// Find the user by username.  If there is no user with the given
-		// username, or the password is not correct, set the user to `false` to
-		// indicate failure and set a flash message.  Otherwise, return the
-		// authenticated `user`.
-		this.options.auth.authenticate(username, password, function(err, user) {
+		// asynchronous verification, for effect...
+		process.nextTick(function () {
+		
+			// Find the user by username.  If there is no user with the given
+			// username, or the password is not correct, set the user to `false` to
+			// indicate failure and set a flash message.  Otherwise, return the
+			// authenticated `user`.
+			this.options.auth.authenticate(username, password, function(err, user) {
+					
+				user = this.options.store.findByUserName(user);
 				
-			user = this.options.store.findByUserName(user);
-			
-			this.fireEvent(this.ON_AUTH, {error: err, username: username});
+				this.fireEvent(this.ON_AUTH, {error: err, username: username});
 
-			if (!user) {
-				return done(null, false, { error: err });
-			}
+				if (!user) {
+					return done(null, false, { error: err });
+				}
 
-			return done(null, user);
-			
-		}.bind(this))
-	
-	}.bind(this));
+				return done(null, user);
+				
+			}.bind(this))
+		
+		}.bind(this));
   }
 	
 });
