@@ -34,22 +34,22 @@ module.exports = new Class({
   auth: null,
   
   options: {
-		store: null,
-		auth: null,
+		//store: null,
+		//auth: null,
 		passport : {
 			session: true,
 		}
 	},
 	
-  initialize: function(app, options){
+  initialize: function(app, store, auth, options){
 		
 		this.setOptions(options);
 		
 		this.app = app;
 		
-		//this.store = store;
+		this.store = store;
 
-		//this.auth = auth;
+		this.auth = auth;
 		
 	// 	this.store = new Memory();
 	// 	this.auth = new Auth();
@@ -61,9 +61,9 @@ module.exports = new Class({
 		//   serialize users into and deserialize users out of the session.  Typically,
 		//   this will be as simple as storing the user ID when serializing, and finding
 		//   the user by ID when deserializing.
-		this.passport.serializeUser(this.options.store.serialize.bind(this.options.store));
+		this.passport.serializeUser(this.store.serialize.bind(this.store));
 
-		this.passport.deserializeUser(this.options.store.deserialize.bind(this.options.store));
+		this.passport.deserializeUser(this.store.deserialize.bind(this.store));
 		
 		/**var authenticate = function(username, password, done) {
 			//console.log('node-express-auth: '+ username + ' ' +password);
@@ -75,9 +75,9 @@ module.exports = new Class({
 				// username, or the password is not correct, set the user to `false` to
 				// indicate failure and set a flash message.  Otherwise, return the
 				// authenticated `user`.
-				this.options.auth.authenticate(username, password, function(err, user) {
+				this.auth.authenticate(username, password, function(err, user) {
 						
-					user = this.options.store.findByUserName(user);
+					user = this.store.findByUserName(user);
 					
 					this.fireEvent(this.ON_AUTH, {error: err, username: username});
 
@@ -247,9 +247,9 @@ module.exports = new Class({
 			// username, or the password is not correct, set the user to `false` to
 			// indicate failure and set a flash message.  Otherwise, return the
 			// authenticated `user`.
-			this.options.auth.authenticate(username, password, function(err, user) {
+			this.auth.authenticate(username, password, function(err, user) {
 					
-				user = this.options.store.findByUserName(user);
+				user = this.store.findByUserName(user);
 				
 				this.fireEvent(this.ON_AUTH, {error: err, username: username});
 
