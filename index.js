@@ -108,12 +108,17 @@ module.exports = new Class({
 		//console.log('extend app');
 		//console.log(typeof(app));
 		
-		this.addEvent(this.ON_AUTH, function(obj){
+		//this.addEvent(this.ON_AUTH, function(obj){
+		this.addEvent(this.ON_AUTH, function(err, user){
 			if(app.log){
-				if(obj.error)
-					app.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
-				else
-					app.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
+				if(err){
+					//app.log('authentication', 'warn', 'authentication : ' + util.inspect(obj));
+					app.log('authentication', 'warn', 'authentication : ' + util.inspect({error: err, username: user}));
+				}
+				else{
+					//app.log('authentication', 'info', 'authentication : ' + util.inspect(obj));
+					app.log('authentication', 'info', 'authentication : ' + util.inspect({username: user}));
+				}
 			}
 		}.bind(this));
 		
@@ -183,31 +188,33 @@ module.exports = new Class({
 				 * */
 				this['authenticate'](req, res, next,  function(err, user, info) {
 				
-				if (err) {
-					this.log('login', 'error', err);
-					req.flash('error', err);
-					this['500'](req, res, next, err);
-				}
-				if (!user) {
-					this.log('login', 'warn', 'login authenticate ' + info);
-					req.flash('error', info);
-					this['403'](req, res, next, info);
-				}
-				else{
-					req.logIn(user, function(err) {
-						if (err) {
-							this.log('login', 'error', err);
-							req.flash('error', err);
-							this['500'](req, res, next, err);
-						}
+					if (err) {
+						this.log('login', 'error', err);
+						req.flash('error', err);
+						this['500'](req, res, next, err);
+					}
+					if (!user) {
+						this.log('login', 'warn', 'login authenticate ' + info);
+						req.flash('error', info);
+						this['403'](req, res, next, info);
+					}
+					else{
+						req.logIn(user, function(err) {
+							if (err) {
+								this.log('login', 'error', err);
+								req.flash('error', err);
+								this['500'](req, res, next, { error: err.message });
+							}
+							else{
+								next();
+							}
+							//console.log('error');
+							//console.log(err);
+							
+							//return next();
 						
-						//console.log('error');
-						//console.log(err);
-						
-						return next();
-					
-					});
-				}
+						}.bind(this));
+					}
 				
 				}.bind(this));//bound to the express app instance
 
@@ -251,7 +258,8 @@ module.exports = new Class({
 					
 				user = this.store.findByUserName(user);
 				
-				this.fireEvent(this.ON_AUTH, {error: err, username: username});
+				//this.fireEvent(this.ON_AUTH, {error: err, user: user});
+				this.fireEvent(this.ON_AUTH, [err, user]);
 
 				if (!user) {
 					return done(null, false, { error: err });
