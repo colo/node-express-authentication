@@ -174,6 +174,7 @@ module.exports = new Class({
 		
 		
 		var check_authentication = function(req, res, next){
+			console.log('---check_authentication--');
 			
 			if (!req.isAuthenticated()) {
 
@@ -187,16 +188,22 @@ module.exports = new Class({
 				 * this refers to the express app instance, NOT this instance
 				 * */
 				this['authenticate'](req, res, next,  function(err, user, info) {
-				
-					if (err) {
-						this.log('login', 'error', err);
-						req.flash('error', err);
-						this['500'](req, res, next, err);
-					}
+					
+					console.log('---err---');
+					console.log(err);
+					console.log(info);
+					
+					//if (err) {
+						//this.log('login', 'error', err);
+						//req.flash('error', err);
+						//this['500'](req, res, next, { error: err });
+					//}
+					//else 
 					if (!user) {
-						this.log('login', 'warn', 'login authenticate ' + info);
-						req.flash('error', info);
-						this['403'](req, res, next, info);
+						const message = (info) ? info.message : err;
+						this.log('login', 'warn', 'login authenticate ' + message);
+						req.flash('error', err);
+						this['403'](req, res, next, {error: message });
 					}
 					else{
 						req.logIn(user, function(err) {
@@ -255,14 +262,18 @@ module.exports = new Class({
 			// indicate failure and set a flash message.  Otherwise, return the
 			// authenticated `user`.
 			this.auth.authenticate(username, password, function(err, user) {
-					
+				
 				user = this.store.findByUserName(user);
+				
+				console.log('----authenticate-----')	;
+				console.log(user);
+				console.log(err);
 				
 				//this.fireEvent(this.ON_AUTH, {error: err, user: user});
 				this.fireEvent(this.ON_AUTH, [err, user]);
 
 				if (!user) {
-					return done(null, false, { error: err });
+					return done(err, false);
 				}
 
 				return done(null, user);
