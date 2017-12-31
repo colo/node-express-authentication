@@ -122,116 +122,116 @@ module.exports = new Class({
 			}
 		}.bind(this));
 		
-		var authenticate = function(req, res, next, func){
-			/**
-			 * Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
-			 * 
-			 * */
+		//var authenticate = function(req, res, next, func){
+			///**
+			 //* Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
+			 //* 
+			 //* */
 			
-			if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
-				//console.log('nod-express-auth: setting BasicStrategy');
-				// Use the LocalStrategy within Passport.
-				//   Strategies in passport require a `verify` function, which accept
-				//   credentials (in this case, a username and password), and invoke a callback
-				//   with a user object.  In the real world, this would query a database;
-				//   however, in this example we are using a baked-in set of users.
-				this.passport.use(new BasicStrategy(this.authenticate.bind(this)));
+			//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+				////console.log('nod-express-auth: setting BasicStrategy');
+				//// Use the LocalStrategy within Passport.
+				////   Strategies in passport require a `verify` function, which accept
+				////   credentials (in this case, a username and password), and invoke a callback
+				////   with a user object.  In the real world, this would query a database;
+				////   however, in this example we are using a baked-in set of users.
+				//this.passport.use(new BasicStrategy(this.authenticate.bind(this)));
 			
 			
-				this.passport.authenticate('basic', {session: this.options.passport.session}, func)(req, res, next);
-			}
-			else{
-				/**
-				 * Content-Type: application/json
-				 * 
-				 * {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
-				 * */
-				//console.log('nod-express-auth: setting LocalStrategy');
-				// Use the LocalStrategy within Passport.
-				//   Strategies in passport require a `verify` function, which accept
-				//   credentials (in this case, a username and password), and invoke a callback
-				//   with a user object.  In the real world, this would query a database;
-				//   however, in this example we are using a baked-in set of users.
-				this.passport.use(new LocalStrategy(this.authenticate.bind(this)));
+				//this.passport.authenticate('basic', {session: this.options.passport.session}, func)(req, res, next);
+			//}
+			//else{
+				///**
+				 //* Content-Type: application/json
+				 //* 
+				 //* {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
+				 //* */
+				////console.log('nod-express-auth: setting LocalStrategy');
+				//// Use the LocalStrategy within Passport.
+				////   Strategies in passport require a `verify` function, which accept
+				////   credentials (in this case, a username and password), and invoke a callback
+				////   with a user object.  In the real world, this would query a database;
+				////   however, in this example we are using a baked-in set of users.
+				//this.passport.use(new LocalStrategy(this.authenticate.bind(this)));
 			
-				this.passport.authenticate('local', {session: this.options.passport.session}, func)(req, res, next);
+				//this.passport.authenticate('local', {session: this.options.passport.session}, func)(req, res, next);
 
-			}
-		}.bind(this);
+			//}
+		//}.bind(this);
 		
 		
 		if(typeof(app) == 'function'){
 			app.implement({
-				authenticate: authenticate
+				authenticate: this._authenticate
 			});
 		}
 		else{
-			app['authenticate'] = authenticate;
+			app['authenticate'] = this._authenticate;
 		}
 		
 		////console.log("app['authenticate']");
 		////console.log(app.authenticate);
 		
 		
-		var check_authentication = function(req, res, next){
-			console.log('---check_authentication--');
+		//var check_authentication = function(req, res, next){
+			//console.log('---check_authentication--');
 			
-			if (!req.isAuthenticated()) {
+			//if (!req.isAuthenticated()) {
 
-			//console.log('check_authentication');
-			////console.log(app);		
-			//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+			////console.log('check_authentication');
+			//////console.log(app);		
+			////if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
 				
-				////console.log(this);
+				//////console.log(this);
 				
-				/**
-				 * this refers to the express app instance, NOT this instance
-				 * */
-				this['authenticate'](req, res, next,  function(err, user, info) {
+				///**
+				 //* this refers to the express app instance, NOT this instance
+				 //* */
+				//this['authenticate'](req, res, next,  function(err, user, info) {
 					
-					console.log('---err---');
-					console.log(err);
-					console.log(info);
+					//console.log('---err---');
+					//console.log(err);
+					//console.log(info);
 					
-					//if (err) {
-						//this.log('login', 'error', err);
+					////if (err) {
+						////this.log('login', 'error', err);
+						////req.flash('error', err);
+						////this['500'](req, res, next, { error: err });
+					////}
+					////else 
+					//if (!user) {
+						//const message = (info) ? info.message : err;
+						//this.log('login', 'warn', 'login authenticate ' + message);
 						//req.flash('error', err);
-						//this['500'](req, res, next, { error: err });
+						//this['403'](req, res, next, {error: message });
 					//}
-					//else 
-					if (!user) {
-						const message = (info) ? info.message : err;
-						this.log('login', 'warn', 'login authenticate ' + message);
-						req.flash('error', err);
-						this['403'](req, res, next, {error: message });
-					}
-					else{
-						req.logIn(user, function(err) {
-							if (err) {
-								this.log('login', 'error', err);
-								req.flash('error', err);
-								this['500'](req, res, next, { error: err.message });
-							}
-							else{
-								next();
-							}
-							//console.log('error');
-							//console.log(err);
+					//else{
+						//req.logIn(user, function(err) {
+							//if (err) {
+								//this.log('login', 'error', err);
+								//req.flash('error', err);
+								//this['500'](req, res, next, { error: err.message });
+							//}
+							//else{
+								//next();
+							//}
+							////console.log('error');
+							////console.log(err);
 							
-							//return next();
+							////return next();
 						
-						}.bind(this));
-					}
+						//}.bind(this));
+					//}
 				
-				}.bind(this));//bound to the express app instance
+				//}.bind(this));//bound to the express app instance
 
-			}
-			else{
-				//console.log('authenticated');
-				next();
-			}
+			//}
+			//else{
+				////console.log('authenticated');
+				//next();
+			//}
 				
-		};
+		//};
 		
 		
 		
@@ -239,11 +239,11 @@ module.exports = new Class({
 		if(!app.check_authentication){
 			if(typeof(app) == 'function'){
 				app.implement({
-					check_authentication: check_authentication
+					check_authentication: this._check_authentication.bind(this)
 				});
 			}
 			else{
-				app['check_authentication'] = check_authentication;
+				app['check_authentication'] = this._check_authentication.bind(this);
 			}
 		}
 		
@@ -251,6 +251,161 @@ module.exports = new Class({
 		
 	
   },
+  check_user: function(){
+		return function(req, res, next){
+			console.log('---check_user.middleware--');
+			this._check_user(req, res, next);
+		}.bind(this);
+	},
+	_check_user: function(req, res, next){
+		console.log('---check_user--');
+		
+		if (!req.isAuthenticated()) {
+	
+			/**
+			 * this refers to the express app instance, NOT this instance
+			 * */
+			this._authenticate(req, res, next,  function(err, user, info) {
+				
+				console.log('---err---');
+				console.log(err);
+				console.log(info);
+				console.log(user);
+				console.log(req.user);
+				
+				if (!user) {
+					req.user = { username: 'anonymous' }
+					//const message = (info) ? info.message : err;
+					//this.app.log('login', 'warn', 'login authenticate ' + message);
+					//req.flash('error', err);
+					//this.app['403'](req, res, next, {error: message });
+					next();
+				}
+				else{
+					req.logIn(user, function(err) {
+						//if (err) {
+							//this.app.log('login', 'error', err);
+							//req.flash('error', err);
+							//this.app['500'](req, res, next, { error: err.message });
+						//}
+						//else{
+							next(err);
+						//}
+					
+					}.bind(this));
+				}
+			
+			}.bind(this));//bound to the express app instance
+
+		}
+		else{
+			//console.log('authenticated');
+			next();
+		}
+	},
+  //middleware
+  check_authentication: function(){
+		return function(req, res, next){
+			console.log('---check_authentication.middleware--');
+			this._check_authentication(req, res, next);
+		}.bind(this);
+	},
+  _check_authentication: function(req, res, next){
+		console.log('---check_authentication--');
+		
+		if (!req.isAuthenticated()) {
+
+		//console.log('check_authentication');
+		////console.log(app);		
+		//if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+			
+			////console.log(this);
+			
+			/**
+			 * this refers to the express app instance, NOT this instance
+			 * */
+			this._authenticate(req, res, next,  function(err, user, info) {
+				
+				console.log('---err---');
+				console.log(err);
+				console.log(info);
+				console.log(user);
+				
+				//if (err) {
+					//this.log('login', 'error', err);
+					//req.flash('error', err);
+					//this['500'](req, res, next, { error: err });
+				//}
+				//else 
+				if (!user) {
+					const message = (info) ? info.message : err;
+					this.app.log('login', 'warn', 'login authenticate ' + message);
+					req.flash('error', err);
+					this.app['403'](req, res, next, {error: message });
+				}
+				else{
+					req.logIn(user, function(err) {
+						if (err) {
+							this.app.log('login', 'error', err);
+							req.flash('error', err);
+							this.app['500'](req, res, next, { error: err.message });
+						}
+						else{
+							next();
+						}
+						//console.log('error');
+						//console.log(err);
+						
+						//return next();
+					
+					}.bind(this));
+				}
+			
+			}.bind(this));//bound to the express app instance
+
+		}
+		else{
+			//console.log('authenticated');
+			next();
+		}
+			
+	},
+	_authenticate: function(req, res, next, func){
+		/**
+		 * Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
+		 * 
+		 * */
+		
+		if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+			//console.log('nod-express-auth: setting BasicStrategy');
+			// Use the LocalStrategy within Passport.
+			//   Strategies in passport require a `verify` function, which accept
+			//   credentials (in this case, a username and password), and invoke a callback
+			//   with a user object.  In the real world, this would query a database;
+			//   however, in this example we are using a baked-in set of users.
+			this.passport.use(new BasicStrategy(this.authenticate.bind(this)));
+		
+		
+			this.passport.authenticate('basic', {session: this.options.passport.session}, func)(req, res, next);
+		}
+		else{
+			/**
+			 * Content-Type: application/json
+			 * 
+			 * {"username": "lbueno", "password": "40bd001563085fc35165329ea1ff5c5ecbdbbeef"}
+			 * */
+			//console.log('nod-express-auth: setting LocalStrategy');
+			// Use the LocalStrategy within Passport.
+			//   Strategies in passport require a `verify` function, which accept
+			//   credentials (in this case, a username and password), and invoke a callback
+			//   with a user object.  In the real world, this would query a database;
+			//   however, in this example we are using a baked-in set of users.
+			this.passport.use(new LocalStrategy(this.authenticate.bind(this)));
+		
+			this.passport.authenticate('local', {session: this.options.passport.session}, func)(req, res, next);
+
+		}
+	},
   authenticate: function(username, password, done) {
 		//console.log('node-express-auth-authenticate: '+ username + ' ' +password);
 
