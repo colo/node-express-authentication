@@ -5,7 +5,8 @@ var path = require('path'),
 	//for authentication
 	flash = require('connect-flash'), //for passport flash
 	LocalStrategy = require('passport-local').Strategy,
-	BasicStrategy = require('passport-http').BasicStrategy;
+	BasicStrategy = require('passport-http').BasicStrategy,
+	UniqueTokenStrategy = require('passport-unique-token').Strategy;
 	//session = require('express-session');//for passport session
 	
 var	packageJSON = JSON.parse(fs.readFileSync(path.join(__dirname, '/package.json')));
@@ -371,12 +372,35 @@ module.exports = new Class({
 			
 	},
 	_authenticate: function(req, res, next, func){
+		
+		/**
+			 * https://github.com/Lughino/passport-unique-token
+			 * guid generator: https://www.guidgenerator.com/online-guid-generator.aspx
+			 * 
+			 * */
+			
+		if(
+			req.params.token || 
+			req.body.token ||
+			req.query.token || 
+			req.headers.token
+			
+		){
+				
+				this.passport.use(new UniqueTokenStrategy(
+					//this.authenticate.bind(this))
+					function (token, done) {
+						this.authenticate.attempt([{token: token}, null, done], this)
+					}.bind(this)
+				));
+				this.passport.authenticate('token', {session: this.options.passport.session}, func)(req, res, next);
+		}
 		/**
 		 * Authorization: Basic bGJ1ZW5vOjQwYmQwMDE1NjMwODVmYzM1MTY1MzI5ZWExZmY1YzVlY2JkYmJlZWY=
 		 * 
 		 * */
 		
-		if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
+		else if(req.headers.authorization && req.headers.authorization.indexOf('Basic') == 0){
 			//console.log('nod-express-auth: setting BasicStrategy');
 			// Use the LocalStrategy within Passport.
 			//   Strategies in passport require a `verify` function, which accept
@@ -407,10 +431,10 @@ module.exports = new Class({
 		}
 	},
   authenticate: function(username, password, done) {
-		//console.log('node-express-auth-authenticate: '+ username + ' ' +password);
+		console.log('node-express-auth-authenticate: ', arguments);
 
 		// asynchronous verification, for effect...
-		process.nextTick(function () {
+		//process.nextTick(function () {
 		
 			// Find the user by username.  If there is no user with the given
 			// username, or the password is not correct, set the user to `false` to
@@ -418,11 +442,18 @@ module.exports = new Class({
 			// authenticated `user`.
 			this.auth.authenticate(username, password, function(err, user) {
 				
-				user = this.store.findByUserName(user);
-				
 				console.log('----authenticate-----')	;
 				console.log(user);
 				console.log(err);
+				
+				if(user){
+					if(user.token){
+						user = this.store.findByToken(user.token);
+					}
+					else{
+						user = this.store.findByUserName(user);
+					}
+				}
 				
 				//this.fireEvent(this.ON_AUTH, {error: err, user: user});
 				this.fireEvent(this.ON_AUTH, [err, user]);
@@ -435,7 +466,7 @@ module.exports = new Class({
 				
 			}.bind(this))
 		
-		}.bind(this));
+		//}.bind(this));
   }
 	
 });
