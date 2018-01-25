@@ -163,11 +163,11 @@ module.exports = new Class({
 		
 		if(typeof(app) == 'function'){
 			app.implement({
-				authenticate: this._authenticate
+				authenticate: this._authenticate.bind(this)
 			});
 		}
 		else{
-			app['authenticate'] = this._authenticate;
+			app['authenticate'] = this._authenticate.bind(this);
 		}
 		
 		////console.log("app['authenticate']");
