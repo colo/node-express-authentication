@@ -459,10 +459,10 @@ module.exports = new Class({
 
 				if(user){
 					if(user.token){
-						user = this.store.findByToken(user.token, callback);
+						this.store.findByToken(user.token, callback);
 					}
 					else{
-						user = this.store.findByUserName(user, callback);
+						this.store.findByUserName(user, callback);
 					}
 				}
 
