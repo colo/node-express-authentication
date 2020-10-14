@@ -447,10 +447,12 @@ module.exports = new Class({
 				console.log(err);
 
 				let callback = function(user){
+					// console.log('----authenticate.callback-----')	;
+					// console.log(arguments);
 					//this.fireEvent(this.ON_AUTH, {error: err, user: user});
 					this.fireEvent(this.ON_AUTH, [err, user]);
 
-					if (!user) {
+					if (err) {
 						return done(err, false);
 					}
 
@@ -459,11 +461,14 @@ module.exports = new Class({
 
 				if(user){
 					if(user.token){
-						this.store.findByToken(user.token, callback);
+						user = this.store.findByToken(user.token, callback);
 					}
 					else{
-						this.store.findByUserName(user, callback);
+						user = this.store.findByUserName(user, callback);
 					}
+				}
+				else{
+					callback()
 				}
 
 
